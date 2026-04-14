@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <title>Superheroes Academy Crossword - Dark Edition</title>
+    <link href="https://fonts.googleapis.com/css2?family=Bangers&display=swap" rel="stylesheet">
+    <style>
+        :root { 
+            --cell: 37px; 
+            --thick: 2.5px solid #000; 
+            --marvel-red: #e23636;
+            --marvel-blue: #0047ab;
+            --marvel-gold: #ffd700;
+        }
+
+        body { 
+            font-family: 'Segoe UI', sans-serif; 
+            display: flex; flex-direction: column; align-items: center; 
+            background-color: #0a0a0a;
+            background-image: 
+                radial-gradient(#1a1a1a 15%, transparent 16%),
+                radial-gradient(#1a1a1a 15%, transparent 16%);
+            background-size: 15px 15px;
+            background-position: 0 0, 7.5px 7.5px;
+            margin: 0; padding: 5px; height: 100vh; overflow: hidden;
+        }
+
+        h1 { 
+            font-family: 'Bangers', cursive;
+            color: var(--marvel-gold); background: var(--marvel-red); padding: 5px 40px; 
+            text-transform: uppercase; box-shadow: 4px 4px 0px var(--marvel-blue), 6px 6px 0px #000;
+            margin: 5px 0 10px 0; font-size: 1.8rem; letter-spacing: 2px;
+            border: 3px solid #fff; transform: skew(-5deg);
+        }
+
+        .main-layout {
+            display: flex; flex-direction: row; align-items: flex-start; 
+            justify-content: center; gap: 15px; width: 99vw; height: 82vh;
+        }
+
+        .grid { 
+            display: grid; grid-template-columns: repeat(16, var(--cell)); 
+            grid-template-rows: repeat(13, var(--cell)); 
+            background: #fff; 
+            box-shadow: 0px 0px 20px rgba(226, 54, 54, 0.3), 8px 8px 0px var(--marvel-red); 
+            border: 3px solid #000; padding: 3px;
+        }
+
+        .c { 
+            width: var(--cell); height: var(--cell); border: var(--thick); 
+            position: relative; margin: -1px; box-sizing: border-box; background: #fff; 
+        }
+
+        .e { border: none !important; background: transparent !important; }
+
+        .n { 
+            position: absolute; top: 1px; left: 2px; font-size: 9px; 
+            font-weight: bold; color: var(--marvel-blue); pointer-events: none;
+        }
+
+        input { 
+            width: 100%; height: 100%; border: none; text-align: center; 
+            font-size: 20px; font-weight: bold; text-transform: uppercase; 
+            outline: none; background: transparent; color: #000;
+        }
+
+        input:focus { background-color: rgba(255, 215, 0, 0.3); }
+        
+        .definitions-container { 
+            background: #fff; padding: 10px; border-radius: 0;
+            box-shadow: 6px 6px 0px var(--marvel-blue); width: 380px; 
+            border: 3px solid #000; height: 98%; display: flex; flex-direction: column;
+        }
+
+        h3 { 
+            font-family: 'Bangers', cursive;
+            text-transform: uppercase; color: #fff; background: var(--marvel-blue);
+            margin: 5px 0 5px 0; font-size: 1.1rem; padding: 3px 10px;
+            border: 2px solid #000; transform: skew(-2deg);
+        }
+
+        .def-list { overflow-y: auto; flex-grow: 1; padding-right: 5px; }
+
+        .def-item { 
+            margin-bottom: 6px; font-size: 11.5px; line-height: 1.3; 
+            color: #111; padding: 4px; border-bottom: 1px dashed #ccc;
+            cursor: zoom-in;
+        }
+
+        .def-item:hover { background: #eee; border-left: 4px solid var(--marvel-red); }
+
+        .def-num { font-weight: 900; color: var(--marvel-red); margin-right: 4px; }
+
+        #focus-overlay {
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.9); z-index: 100; justify-content: center; align-items: center;
+        }
+
+        .focus-card {
+            background: #fff; padding: 25px; border: 5px solid #000;
+            max-width: 500px; text-align: center; cursor: pointer;
+            box-shadow: 12px 12px 0px var(--marvel-gold);
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Superheroes Academy Crossword</h1>
+
+    <div class="main-layout">
+        <div class="grid" id="cw-grid">
+            <div class="c e"></div><div class="c e"></div><div class="c e"></div><div class="c e"></div><div class="c e"></div><div class="c e"></div><div class="c e"></div><div class="c e"></div><div class="c e"></div><div class="c"><span class="n">1</span><input data-r="0" data-c="9"></div><div class="c e"></div><div class="c e"></div><div class="c e"></div><div class="c e"></div><div class="c e"></div><div class="c e"></div>
+            <div class="c e"></div><div class="c e"></div><div class="c e"></div><div class="c e"></div><div class="c e"></div><div class="c e"></div><div class="c e"></div><div class="c e"></div><div class="c"><span class="n">2</span><input data-r="1" data-c="8"></div><div class="c"><input data-r="1" data-c="9"></div><div class="c"><input data-r="1" data-c="10"></div><div class="c"><input data-r="1" data-c="11"></div><div class="c e"></div><div class="c e"></div><div class="c e"></div><div class="c e"></div>
+            <div class="c e"></div><div class="c e"></div><div class="c e"></div><div class="c e"></div><div class="c e"></div><div class="c e"></div><div class="c e"></div><div class="c e"></div><div class="c e"></div><div class="c"><input data-r="2" data-c="9"></div><div class="c e"></div><div class="c e"></div><div class="c e"></div><div class="c e"></div><div class="c e"></div><div class="c e"></div>
+            <div class="c e"></div><div class="c e"></div><div class="c e"></div><div class="c e"></div><div class="c e"></div><div class="c e"></div><div class="c e"></div><div class="c e"></div><div class="c e"></div><div class="c"><input data-r="3" data-c="9"></div><div class="c e"></div><div class="c e"></div><div class="c e"></div><div class="c e"></div><div class="c e"></div><div class="c e"></div>
+            <div class="c e"></div><div class="c e"></div><div class="c e"></div><div class="c e"></div><div class="c e"></div><div class="c e"></div><div class="c e"></div><div class="c e"></div><div class="c e"></div><div class="c"><input data-r="4" data-c="9"></div><div class="c e"></div><div class="c e"></div><div class="c e"></div><div class="c e"></div><div class="c e"></div><div class="c e"></div>
+            <div class="c e"></div><div class="c e"></div><div class="c e"></div><div class="c e"></div><div class="c e"></div><div class="c e"></div><div class="c e"></div>
+            <div class="c"><span class="n">5</span><input data-r="5" data-c="7"></div>
+            <div class="c"><input data-r="5" data-c="8"></div>
+            <div class="c"><input data-r="5" data-c="9"></div>
+            <div class="c"><input data-r="5" data-c="10"></div>
+            <div class="c"><input data-r="5" data-c="11"></div>
+            <div class="c"><input data-r="5" data-c="12"></div>
+            <div class="c"><input data-r="5" data-c="13"></div>
+            <div class="c"><span class="n">8</span><input data-r="5" data-c="14"></div>
+            <div class="c e"></div>
+            <div class="c e"></div><div class="c e"></div><div class="c e"></div><div class="c e"></div><div class="c e"></div><div class="c e"></div><div class="c e"></div><div class="c"><input data-r="6" data-c="7"></div><div class="c e"></div><div class="c"><input data-r="6" data-c="9"></div><div class="c e"></div><div class="c e"></div><div class="c e"></div><div class="c e"></div><div class="c"><input data-r="6" data-c="14"></div><div class="c e"></div>
+            <div class="c e"></div><div class="c e"></div><div class="c e"></div><div class="c e"></div><div class="c e"></div><div class="c e"></div><div class="c e"></div><div class="c"><input data-r="7" data-c="7"></div><div class="c e"></div><div class="c e"></div><div class="c e"></div><div class="c e"></div><div class="c e"></div><div class="c e"></div><div class="c"><input data-r="7" data-c="14"></div><div class="c e"></div>
+            <div class="c e"></div><div class="c e"></div><div class="c"><span class="n">6</span><input data-r="8" data-c="2"></div><div class="c"><input data-r="8" data-c="3"></div><div class="c"><input data-r="8" data-c="4"></div><div class="c"><input data-r="8" data-c="5"></div><div class="c"><input data-r="8" data-c="6"></div><div class="c"><input data-r="8" data-c="7"></div><div class="c e"></div><div class="c e"></div><div class="c e"></div><div class="c e"></div><div class="c e"></div><div class="c e"></div><div class="c"><input data-r="8" data-c="14"></div><div class="c e"></div>
+            <div class="c e"></div><div class="c e"></div><div class="c"><input data-r="9" data-c="2"></div><div class="c e"></div><div class="c e"></div><div class="c e"></div><div class="c e"></div><div class="c"><input data-r="9" data-c="7"></div><div class="c e"></div><div class="c e"></div><div class="c e"></div><div class="c e"></div><div class="c e"></div><div class="c e"></div><div class="c"><input data-r="9" data-c="14"></div><div class="c e"></div>
+            <div class="c e"></div><div class="c"><span class="n">7</span><input data-r="10" data-c="1"></div><div class="c"><input data-r="10" data-c="2"></div><div class="c"><input data-r="10" data-c="3"></div><div class="c"><input data-r="10" data-c="4"></div><div class="c e"></div><div class="c e"></div><div class="c"><input data-r="10" data-c="7"></div><div class="c e"></div><div class="c e"></div><div class="c e"></div><div class="c e"></div><div class="c e"></div><div class="c e"></div><div class="c"><input data-r="10" data-c="14"></div><div class="c e"></div>
+            <div class="c e"></div><div class="c e"></div><div class="c"><input data-r="11" data-c="2"></div><div class="c e"></div><div class="c e"></div><div class="c e"></div><div class="c"><span class="n">3</span><input data-r="11" data-c="6"></div><div class="c"><input data-r="11" data-c="7"></div><div class="c"><input data-r="11" data-c="8"></div><div class="c e"></div><div class="c e"></div><div class="c e"></div><div class="c e"></div><div class="c e"></div><div class="c e"></div><div class="c e"></div>
+            <div class="c"><span class="n">9</span><input data-r="12" data-c="0"></div><div class="c"><input data-r="12" data-c="1"></div><div class="c"><input data-r="12" data-c="2"></div><div class="c"><input data-r="12" data-c="3"></div><div class="c e"></div><div class="c e"></div><div class="c e"></div><div class="c e"></div><div class="c e"></div><div class="c e"></div><div class="c e"></div><div class="c e"></div><div class="c e"></div><div class="c e"></div><div class="c e"></div><div class="c e"></div>
+        </div>
+
+        <div class="definitions-container">
+            <div class="def-list">
+                <h3>Orizzontali</h3>
+                <div class="def-item" onclick="focusDef('2. ORIZZONTALE', 'Il gigante verde fortissimo in cui si trasforma lo scienziato Bruce Banner quando si arrabbia.')"><span class="def-num">2.</span> Il gigante verde Bruce Banner quando si arrabbia...</div>
+                <div class="def-item" onclick="focusDef('3. ORIZZONTALE', 'Il cognome dello scienziato Hank che rimpicciolisce le cose e ricopre il ruolo di preside della scuola.')"><span class="def-num">3.</span> Il cognome di Hank, preside della scuola...</div>
+                <div class="def-item" onclick="focusDef('5. ORIZZONTALE', 'Il gruppo di eroi soprannominati i più potenti della Terra che si è unito per la prima volta per fermare Loki.')"><span class="def-num">5.</span> Il gruppo di eroi soprannominati i più potenti della Terra...</div>
+                <div class="def-item" onclick="focusDef('6. ORIZZONTALE', 'L\'organizzazione segreta di Nick Fury che ha ideato il piano per riunire gli eroi.')"><span class="def-num">6.</span> L\'organizzazione segreta guidata da Nick Fury...</div>
+                <div class="def-item" onclick="focusDef('7. ORIZZONTALE', 'La supereroina capace di volare e rimpicciolirsi che ha scelto il nome ufficiale della squadra.')"><span class="def-num">7.</span> La supereroina capace di volare e rimpicciolirsi...</div>
+                <div class="def-item" onclick="focusDef('9. ORIZZONTALE', 'Il Dio dell\'Inganno asgardiano, primo nemico storico che spinse gli eroi a formare il team.')"><span class="def-num">9.</span> Il Dio dell\'Inganno asgardiano, primo nemico storico...</div>
+
+                <h3>Verticali</h3>
+                <div class="def-item" onclick="focusDef('1. VERTICALE', 'Il tecnologico aereo a cinque motori utilizzato dagli eroi per spostarsi rapidamente in missione.')"><span class="def-num">1.</span> Il tecnologico aereo a cinque motori degli eroi...</div>
+                <div class="def-item" onclick="focusDef('5. VERTICALE', 'La scuola speciale creata per addestrare i giovani supereroi sotto la guida dei veterani.')"><span class="def-num">5.</span> La scuola speciale creata per addestrare i giovani eroi...</div>
+                <div class="def-item" onclick="focusDef('6. VERTICALE', 'Il cognome di Tony, il genio miliardario che ospita la squadra nella sua lussuosa Mansion a New York.')"><span class="def-num">6.</span> Il cognome di Tony, il genio che ospita la squadra...</div>
+                <div class="def-item" onclick="focusDef('8. VERTICALE', 'Il soprannome amichevole del tessiragnatele di quartiere.')"><span class="def-num">8.</span> Il soprannome amichevole del tessiragnatele...</div>
+            </div>
+        </div>
+    </div>
+
+    <div id="focus-overlay" onclick="closeFocus()">
+        <div class="focus-card">
+            <h2 id="focus-num" style="color:var(--marvel-red); font-family: 'Bangers', cursive; text-transform: uppercase; font-size: 1.8rem; margin:0 0 10px 0;"></h2>
+            <p id="focus-text" style="font-size:1.4rem; font-weight: bold; font-family: 'Segoe UI'; margin:0;"></p>
+        </div>
+    </div>
+
+    <script>
+        let dir = 'h'; 
+        const grid = document.getElementById('cw-grid');
+
+        function focusDef(n, t) { 
+            document.getElementById('focus-num').innerText = n;
+            document.getElementById('focus-text').innerText = t;
+            document.getElementById('focus-overlay').style.display = 'flex';
+        }
+
+        function closeFocus() { 
+            document.getElementById('focus-overlay').style.display = 'none'; 
+        }
+        
+        // Logica migliorata per il cambio direzione al click
+        grid.addEventListener('click', (e) => {
+            if (e.target.tagName === 'INPUT') {
+                const r = parseInt(e.target.dataset.r), c = parseInt(e.target.dataset.c);
+                const nSpan = e.target.parentElement.querySelector('.n');
+                
+                // Se clicco su un numero specifico
+                if (nSpan) {
+                    const n = nSpan.innerText;
+                    if (['1', '8'].includes(n)) dir = 'v';
+                    else if (['2', '3', '7', '9'].includes(n)) dir = 'h';
+                    else if (['5', '6'].includes(n)) {
+                        // Per le caselle ad incrocio, alterna la direzione
+                        dir = (dir === 'h') ? 'v' : 'h';
+                    }
+                } else {
+                    // Se clicco su una cella senza numero, capisco la direzione dalle celle adiacenti
+                    const hasRight = document.querySelector(`input[data-r="${r}"][data-c="${c+1}"]`);
+                    const hasLeft = document.querySelector(`input[data-r="${r}"][data-c="${c-1}"]`);
+                    const hasDown = document.querySelector(`input[data-r="${r+1}"][data-c="${c}"]`);
+                    const hasUp = document.querySelector(`input[data-r="${r-1}"][data-c="${c}"]`);
+
+                    if ((hasRight || hasLeft) && !(hasDown || hasUp)) dir = 'h';
+                    else if (!(hasRight || hasLeft) && (hasDown || hasUp)) dir = 'v';
+                }
+            }
+        });
+
+        grid.addEventListener('input', (e) => {
+            if (e.target.value.length === 1) {
+                const r = parseInt(e.target.dataset.r), c = parseInt(e.target.dataset.c);
+                
+                // Forza la direzione orizzontale per la riga 5 (AVENGERS) se non diversamente specificato
+                if (r === 5 && c === 7 && dir === 'v') {
+                    // Se l'utente clicca sulla 5 e inizia a scrivere, noi vogliamo AVENGERS (h)
+                    // A meno che non abbia cliccato due volte per andare in verticale (ACADEMY)
+                }
+
+                let next = (dir === 'h') ? 
+                    document.querySelector(`input[data-r="${r}"][data-c="${c+1}"]`) : 
+                    document.querySelector(`input[data-r="${r+1}"][data-c="${c}"]`);
+                
+                if (next) next.focus();
+            }
+        });
+
+        grid.addEventListener('keydown', (e) => {
+            const r = parseInt(e.target.dataset.r), c = parseInt(e.target.dataset.c);
+            
+            if (e.key === 'Backspace' && e.target.value === '') {
+                let prev = (dir === 'h') ? 
+                    document.querySelector(`input[data-r="${r}"][data-c="${c-1}"]`) : 
+                    document.querySelector(`input[data-r="${r-1}"][data-c="${c}"]`);
+                if (prev) prev.focus();
+            }
+            
+            // Permette di cambiare direzione con le frecce tastiera
+            if (e.key === 'ArrowRight' || e.key === 'ArrowLeft') dir = 'h';
+            if (e.key === 'ArrowDown' || e.key === 'ArrowUp') dir = 'v';
+        });
+    </script>
+</body>
+</html>
