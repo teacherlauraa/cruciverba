@@ -4,10 +4,11 @@
     <meta charset="UTF-8">
     <title>Superheroes Academy Crossword - Dark Edition</title>
     <link href="https://fonts.googleapis.com/css2?family=Bangers&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <style>
         :root { 
-            --cell: 37px; 
-            --thick: 2.5px solid #000; 
+            --cell: 34px; 
+            --thick: 2px solid #000; 
             --marvel-red: #e23636;
             --marvel-blue: #0047ab;
             --marvel-gold: #ffd700;
@@ -17,90 +18,76 @@
             font-family: 'Segoe UI', sans-serif; 
             display: flex; flex-direction: column; align-items: center; 
             background-color: #0a0a0a;
-            background-image: 
-                radial-gradient(#1a1a1a 15%, transparent 16%),
-                radial-gradient(#1a1a1a 15%, transparent 16%);
-            background-size: 15px 15px;
-            background-position: 0 0, 7.5px 7.5px;
+            background-image: radial-gradient(#1a1a1a 15%, transparent 16%), radial-gradient(#1a1a1a 15%, transparent 16%);
+            background-size: 15px 15px; background-position: 0 0, 7.5px 7.5px;
             margin: 0; padding: 5px; height: 100vh; overflow: hidden;
+            text-transform: uppercase;
         }
 
         h1 { 
-            font-family: 'Bangers', cursive;
-            color: var(--marvel-gold); background: var(--marvel-red); padding: 5px 40px; 
-            text-transform: uppercase; box-shadow: 4px 4px 0px var(--marvel-blue), 6px 6px 0px #000;
-            margin: 5px 0 10px 0; font-size: 1.8rem; letter-spacing: 2px;
-            border: 3px solid #fff; transform: skew(-5deg);
+            font-family: 'Bangers', cursive; color: var(--marvel-gold); background: var(--marvel-red); 
+            padding: 5px 30px; box-shadow: 3px 3px 0px var(--marvel-blue);
+            margin: 5px 0; font-size: 1.6rem; border: 3px solid #fff; transform: skew(-5deg);
         }
 
         .main-layout {
-            display: flex; flex-direction: row; align-items: flex-start; 
-            justify-content: center; gap: 15px; width: 99vw; height: 82vh;
+            display: flex; flex-direction: row; align-items: stretch; 
+            justify-content: center; gap: 20px; width: 98vw; height: 82vh;
         }
+
+        .grid-wrapper { display: flex; flex-direction: column; align-items: center; justify-content: center; }
 
         .grid { 
             display: grid; grid-template-columns: repeat(16, var(--cell)); 
             grid-template-rows: repeat(13, var(--cell)); 
-            background: #fff; 
-            box-shadow: 0px 0px 20px rgba(226, 54, 54, 0.3), 8px 8px 0px var(--marvel-red); 
-            border: 3px solid #000; padding: 3px;
+            background: #fff; box-shadow: 0px 0px 15px rgba(226, 54, 54, 0.3), 5px 5px 0px var(--marvel-red); 
+            border: 3px solid #000; padding: 2px;
         }
 
-        .c { 
-            width: var(--cell); height: var(--cell); border: var(--thick); 
-            position: relative; margin: -1px; box-sizing: border-box; background: #fff; 
-        }
-
+        .c { width: var(--cell); height: var(--cell); border: var(--thick); position: relative; margin: -1px; box-sizing: border-box; background: #fff; }
         .e { border: none !important; background: transparent !important; }
+        .n { position: absolute; top: 1px; left: 1px; font-size: 8px; font-weight: bold; color: var(--marvel-blue); z-index: 5; text-transform: none; }
 
-        .n { 
-            position: absolute; top: 1px; left: 2px; font-size: 9px; 
-            font-weight: bold; color: var(--marvel-blue); pointer-events: none;
-        }
-
-        input { 
-            width: 100%; height: 100%; border: none; text-align: center; 
-            font-size: 20px; font-weight: bold; text-transform: uppercase; 
-            outline: none; background: transparent; color: #000;
-        }
-
-        input:focus { background-color: rgba(255, 215, 0, 0.3); }
+        input { width: 100%; height: 100%; border: none; text-align: center; font-size: 18px; font-weight: bold; outline: none; background: transparent; color: #000; }
+        input:focus { background-color: rgba(255, 215, 0, 0.4); }
         
+        .cell-correct { background-color: #90ee90 !important; }
+        .cell-wrong { background-color: #ffcccb !important; }
+
+        .definitions-column { display: flex; flex-direction: column; gap: 10px; width: 380px; height: 100%; }
+
         .definitions-container { 
-            background: #fff; padding: 10px; border-radius: 0;
-            box-shadow: 6px 6px 0px var(--marvel-blue); width: 380px; 
-            border: 3px solid #000; height: 98%; display: flex; flex-direction: column;
+            background: #fff; padding: 10px; border: 3px solid #000;
+            box-shadow: 5px 5px 0px var(--marvel-blue); flex-grow: 1; overflow: hidden; display: flex; flex-direction: column;
         }
 
-        h3 { 
-            font-family: 'Bangers', cursive;
-            text-transform: uppercase; color: #fff; background: var(--marvel-blue);
-            margin: 5px 0 5px 0; font-size: 1.1rem; padding: 3px 10px;
-            border: 2px solid #000; transform: skew(-2deg);
-        }
+        h3 { font-family: 'Bangers'; color: #fff; background: var(--marvel-blue); margin: 2px 0; font-size: 1.1rem; padding: 4px; border: 2px solid #000; }
 
         .def-list { overflow-y: auto; flex-grow: 1; padding-right: 5px; }
-
-        .def-item { 
-            margin-bottom: 6px; font-size: 11.5px; line-height: 1.3; 
-            color: #111; padding: 4px; border-bottom: 1px dashed #ccc;
-            cursor: zoom-in;
-        }
-
-        .def-item:hover { background: #eee; border-left: 4px solid var(--marvel-red); }
-
+        .def-item { margin-bottom: 5px; font-size: 11px; line-height: 1.3; color: #111; padding: 4px; border-bottom: 1px dashed #ccc; cursor: zoom-in; }
         .def-num { font-weight: 900; color: var(--marvel-red); margin-right: 4px; }
 
-        #focus-overlay {
-            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.9); z-index: 100; justify-content: center; align-items: center;
+        .btn-control {
+            background: var(--marvel-gold); color: #000; border: 4px solid #000;
+            padding: 10px; font-family: 'Bangers'; font-size: 1.8rem;
+            cursor: pointer; box-shadow: 4px 4px 0px #000; width: 100%; text-transform: uppercase;
         }
 
-        .focus-card {
-            background: #fff; padding: 25px; border: 5px solid #000;
-            max-width: 500px; text-align: center; cursor: pointer;
-            box-shadow: 12px 12px 0px var(--marvel-gold);
+        /* MODALI */
+        #focus-overlay, #win-overlay {
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.9); z-index: 1000; justify-content: center; align-items: center;
         }
+        .focus-card, .win-card {
+            background: #fff; padding: 40px; border: 6px solid #000;
+            max-width: 80%; text-align: center; box-shadow: 20px 20px 0px var(--marvel-gold);
+            pointer-events: auto; position: relative; z-index: 1001; 
+        }
+        #focus-num, .win-card h2 { font-family: 'Bangers'; color: var(--marvel-red); font-size: 3.5rem; margin: 0 0 20px 0; }
+        #focus-text, .win-card p { font-size: 2.2rem; font-weight: 900; line-height: 1.2; color: #000; }
+        .win-card p { font-size: 1.4rem; margin: 20px 0; }
+        
+        #final-code { font-size: 7rem; color: var(--marvel-red); display: none; font-family: 'Bangers'; margin-top: 10px; text-shadow: 4px 4px 0px #000; }
     </style>
 </head>
 <body>
@@ -108,130 +95,177 @@
     <h1>Superheroes Academy Crossword</h1>
 
     <div class="main-layout">
-        <div class="grid" id="cw-grid">
-            <div class="c e"></div><div class="c e"></div><div class="c e"></div><div class="c e"></div><div class="c e"></div><div class="c e"></div><div class="c e"></div><div class="c e"></div><div class="c e"></div><div class="c"><span class="n">1</span><input data-r="0" data-c="9"></div><div class="c e"></div><div class="c e"></div><div class="c e"></div><div class="c e"></div><div class="c e"></div><div class="c e"></div>
-            <div class="c e"></div><div class="c e"></div><div class="c e"></div><div class="c e"></div><div class="c e"></div><div class="c e"></div><div class="c e"></div><div class="c e"></div><div class="c"><span class="n">2</span><input data-r="1" data-c="8"></div><div class="c"><input data-r="1" data-c="9"></div><div class="c"><input data-r="1" data-c="10"></div><div class="c"><input data-r="1" data-c="11"></div><div class="c e"></div><div class="c e"></div><div class="c e"></div><div class="c e"></div>
-            <div class="c e"></div><div class="c e"></div><div class="c e"></div><div class="c e"></div><div class="c e"></div><div class="c e"></div><div class="c e"></div><div class="c e"></div><div class="c e"></div><div class="c"><input data-r="2" data-c="9"></div><div class="c e"></div><div class="c e"></div><div class="c e"></div><div class="c e"></div><div class="c e"></div><div class="c e"></div>
-            <div class="c e"></div><div class="c e"></div><div class="c e"></div><div class="c e"></div><div class="c e"></div><div class="c e"></div><div class="c e"></div><div class="c e"></div><div class="c e"></div><div class="c"><input data-r="3" data-c="9"></div><div class="c e"></div><div class="c e"></div><div class="c e"></div><div class="c e"></div><div class="c e"></div><div class="c e"></div>
-            <div class="c e"></div><div class="c e"></div><div class="c e"></div><div class="c e"></div><div class="c e"></div><div class="c e"></div><div class="c e"></div><div class="c e"></div><div class="c e"></div><div class="c"><input data-r="4" data-c="9"></div><div class="c e"></div><div class="c e"></div><div class="c e"></div><div class="c e"></div><div class="c e"></div><div class="c e"></div>
-            <div class="c e"></div><div class="c e"></div><div class="c e"></div><div class="c e"></div><div class="c e"></div><div class="c e"></div><div class="c e"></div>
-            <div class="c"><span class="n">5</span><input data-r="5" data-c="7"></div>
-            <div class="c"><input data-r="5" data-c="8"></div>
-            <div class="c"><input data-r="5" data-c="9"></div>
-            <div class="c"><input data-r="5" data-c="10"></div>
-            <div class="c"><input data-r="5" data-c="11"></div>
-            <div class="c"><input data-r="5" data-c="12"></div>
-            <div class="c"><input data-r="5" data-c="13"></div>
-            <div class="c"><span class="n">8</span><input data-r="5" data-c="14"></div>
-            <div class="c e"></div>
-            <div class="c e"></div><div class="c e"></div><div class="c e"></div><div class="c e"></div><div class="c e"></div><div class="c e"></div><div class="c e"></div><div class="c"><input data-r="6" data-c="7"></div><div class="c e"></div><div class="c"><input data-r="6" data-c="9"></div><div class="c e"></div><div class="c e"></div><div class="c e"></div><div class="c e"></div><div class="c"><input data-r="6" data-c="14"></div><div class="c e"></div>
-            <div class="c e"></div><div class="c e"></div><div class="c e"></div><div class="c e"></div><div class="c e"></div><div class="c e"></div><div class="c e"></div><div class="c"><input data-r="7" data-c="7"></div><div class="c e"></div><div class="c e"></div><div class="c e"></div><div class="c e"></div><div class="c e"></div><div class="c e"></div><div class="c"><input data-r="7" data-c="14"></div><div class="c e"></div>
-            <div class="c e"></div><div class="c e"></div><div class="c"><span class="n">6</span><input data-r="8" data-c="2"></div><div class="c"><input data-r="8" data-c="3"></div><div class="c"><input data-r="8" data-c="4"></div><div class="c"><input data-r="8" data-c="5"></div><div class="c"><input data-r="8" data-c="6"></div><div class="c"><input data-r="8" data-c="7"></div><div class="c e"></div><div class="c e"></div><div class="c e"></div><div class="c e"></div><div class="c e"></div><div class="c e"></div><div class="c"><input data-r="8" data-c="14"></div><div class="c e"></div>
-            <div class="c e"></div><div class="c e"></div><div class="c"><input data-r="9" data-c="2"></div><div class="c e"></div><div class="c e"></div><div class="c e"></div><div class="c e"></div><div class="c"><input data-r="9" data-c="7"></div><div class="c e"></div><div class="c e"></div><div class="c e"></div><div class="c e"></div><div class="c e"></div><div class="c e"></div><div class="c"><input data-r="9" data-c="14"></div><div class="c e"></div>
-            <div class="c e"></div><div class="c"><span class="n">7</span><input data-r="10" data-c="1"></div><div class="c"><input data-r="10" data-c="2"></div><div class="c"><input data-r="10" data-c="3"></div><div class="c"><input data-r="10" data-c="4"></div><div class="c e"></div><div class="c e"></div><div class="c"><input data-r="10" data-c="7"></div><div class="c e"></div><div class="c e"></div><div class="c e"></div><div class="c e"></div><div class="c e"></div><div class="c e"></div><div class="c"><input data-r="10" data-c="14"></div><div class="c e"></div>
-            <div class="c e"></div><div class="c e"></div><div class="c"><input data-r="11" data-c="2"></div><div class="c e"></div><div class="c e"></div><div class="c e"></div><div class="c"><span class="n">3</span><input data-r="11" data-c="6"></div><div class="c"><input data-r="11" data-c="7"></div><div class="c"><input data-r="11" data-c="8"></div><div class="c e"></div><div class="c e"></div><div class="c e"></div><div class="c e"></div><div class="c e"></div><div class="c e"></div><div class="c e"></div>
-            <div class="c"><span class="n">9</span><input data-r="12" data-c="0"></div><div class="c"><input data-r="12" data-c="1"></div><div class="c"><input data-r="12" data-c="2"></div><div class="c"><input data-r="12" data-c="3"></div><div class="c e"></div><div class="c e"></div><div class="c e"></div><div class="c e"></div><div class="c e"></div><div class="c e"></div><div class="c e"></div><div class="c e"></div><div class="c e"></div><div class="c e"></div><div class="c e"></div><div class="c e"></div>
+        <div class="grid-wrapper">
+            <div class="grid" id="cw-grid">
+                <div class="c e"></div><div class="c e"></div><div class="c e"></div><div class="c e"></div><div class="c e"></div><div class="c e"></div><div class="c e"></div><div class="c e"></div><div class="c e"></div><div class="c"><span class="n">1</span><input data-r="0" data-c="9" data-a="Q" maxlength="1"></div><div class="c e"></div><div class="c e"></div><div class="c e"></div><div class="c e"></div><div class="c e"></div><div class="c e"></div>
+                <div class="c e"></div><div class="c e"></div><div class="c e"></div><div class="c e"></div><div class="c e"></div><div class="c e"></div><div class="c e"></div><div class="c e"></div><div class="c"><span class="n">2</span><input data-r="1" data-c="8" data-a="H" maxlength="1"></div><div class="c"><input data-r="1" data-c="9" data-a="U" maxlength="1"></div><div class="c"><input data-r="1" data-c="10" data-a="L" maxlength="1"></div><div class="c"><input data-r="1" data-c="11" data-a="K" maxlength="1"></div><div class="c e"></div><div class="c e"></div><div class="c e"></div><div class="c e"></div>
+                <div class="c e"></div><div class="c e"></div><div class="c e"></div><div class="c e"></div><div class="c e"></div><div class="c e"></div><div class="c e"></div><div class="c e"></div><div class="c e"></div><div class="c"><input data-r="2" data-c="9" data-a="I" maxlength="1"></div><div class="c e"></div><div class="c e"></div><div class="c e"></div><div class="c e"></div><div class="c e"></div><div class="c e"></div>
+                <div class="c e"></div><div class="c e"></div><div class="c e"></div><div class="c e"></div><div class="c e"></div><div class="c e"></div><div class="c e"></div><div class="c e"></div><div class="c e"></div><div class="c"><input data-r="3" data-c="9" data-a="N" maxlength="1"></div><div class="c e"></div><div class="c e"></div><div class="c e"></div><div class="c e"></div><div class="c e"></div><div class="c e"></div>
+                <div class="c e"></div><div class="c e"></div><div class="c e"></div><div class="c e"></div><div class="c e"></div><div class="c e"></div><div class="c e"></div><div class="c e"></div><div class="c e"></div><div class="c"><input data-r="4" data-c="9" data-a="J" maxlength="1"></div><div class="c e"></div><div class="c e"></div><div class="c e"></div><div class="c e"></div><div class="c e"></div><div class="c e"></div>
+                <div class="c e"></div><div class="c e"></div><div class="c e"></div><div class="c e"></div><div class="c e"></div><div class="c e"></div><div class="c e"></div><div class="c"><span class="n">5</span><input data-r="5" data-c="7" data-a="A" maxlength="1"></div><div class="c"><input data-r="5" data-c="8" data-a="V" maxlength="1"></div><div class="c"><input data-r="5" data-c="9" data-a="E" maxlength="1"></div><div class="c"><input data-r="5" data-c="10" data-a="N" maxlength="1"></div><div class="c"><input data-r="5" data-c="11" data-a="G" maxlength="1"></div><div class="c"><input data-r="5" data-c="12" data-a="E" maxlength="1"></div><div class="c"><input data-r="5" data-c="13" data-a="R" maxlength="1"></div><div class="c"><span class="n">8</span><input data-r="5" data-c="14" data-a="S" maxlength="1"></div><div class="c e"></div>
+                <div class="c e"></div><div class="c e"></div><div class="c e"></div><div class="c e"></div><div class="c e"></div><div class="c e"></div><div class="c e"></div><div class="c"><input data-r="6" data-c="7" data-a="C" maxlength="1"></div><div class="c e"></div><div class="c"><input data-r="6" data-c="9" data-a="T" maxlength="1"></div><div class="c e"></div><div class="c e"></div><div class="c e"></div><div class="c e"></div><div class="c"><input data-r="6" data-c="14" data-a="P" maxlength="1"></div><div class="c e"></div>
+                <div class="c e"></div><div class="c e"></div><div class="c e"></div><div class="c e"></div><div class="c e"></div><div class="c e"></div><div class="c e"></div><div class="c"><input data-r="7" data-c="7" data-a="A" maxlength="1"></div><div class="c e"></div><div class="c e"></div><div class="c e"></div><div class="c e"></div><div class="c e"></div><div class="c e"></div><div class="c"><input data-r="7" data-c="14" data-a="I" maxlength="1"></div><div class="c e"></div>
+                <div class="c e"></div><div class="c e"></div><div class="c"><span class="n">6</span><input data-r="8" data-c="2" data-a="S" maxlength="1"></div><div class="c"><input data-r="8" data-c="3" data-a="H" maxlength="1"></div><div class="c"><input data-r="8" data-c="4" data-a="I" maxlength="1"></div><div class="c"><input data-r="8" data-c="5" data-a="E" maxlength="1"></div><div class="c"><input data-r="8" data-c="6" data-a="L" maxlength="1"></div><div class="c"><input data-r="8" data-c="7" data-a="D" maxlength="1"></div><div class="c e"></div><div class="c e"></div><div class="c e"></div><div class="c e"></div><div class="c e"></div><div class="c e"></div><div class="c"><input data-r="8" data-c="14" data-a="D" maxlength="1"></div><div class="c e"></div>
+                <div class="c e"></div><div class="c e"></div><div class="c"><input data-r="9" data-c="2" data-a="T" maxlength="1"></div><div class="c e"></div><div class="c e"></div><div class="c e"></div><div class="c e"></div><div class="c"><input data-r="9" data-c="7" data-a="E" maxlength="1"></div><div class="c e"></div><div class="c e"></div><div class="c e"></div><div class="c e"></div><div class="c e"></div><div class="c e"></div><div class="c"><input data-r="9" data-c="14" data-a="E" maxlength="1"></div><div class="c e"></div>
+                <div class="c e"></div><div class="c"><span class="n">7</span><input data-r="10" data-c="1" data-a="W" maxlength="1"></div><div class="c"><input data-r="10" data-c="2" data-a="A" maxlength="1"></div><div class="c"><input data-r="10" data-c="3" data-a="S" maxlength="1"></div><div class="c"><input data-r="10" data-c="4" data-a="P" maxlength="1"></div><div class="c e"></div><div class="c e"></div><div class="c"><input data-r="10" data-c="7" data-a="M" maxlength="1"></div><div class="c e"></div><div class="c e"></div><div class="c e"></div><div class="c e"></div><div class="c e"></div><div class="c e"></div><div class="c"><input data-r="10" data-c="14" data-a="Y" maxlength="1"></div><div class="c e"></div>
+                <div class="c e"></div><div class="c e"></div><div class="c"><input data-r="11" data-c="2" data-a="R" maxlength="1"></div><div class="c e"></div><div class="c e"></div><div class="c e"></div><div class="c"><span class="n">3</span><input data-r="11" data-c="6" data-a="P" maxlength="1"></div><div class="c"><input data-r="11" data-c="7" data-a="Y" maxlength="1"></div><div class="c"><input data-r="11" data-c="8" data-a="M" maxlength="1"></div><div class="c e"></div><div class="c e"></div><div class="c e"></div><div class="c e"></div><div class="c e"></div><div class="c e"></div><div class="c e"></div>
+                <div class="c"><span class="n">9</span><input data-r="12" data-c="0" data-a="L" maxlength="1"></div><div class="c"><input data-r="12" data-c="1" data-a="O" maxlength="1"></div><div class="c"><input data-r="12" data-c="2" data-a="K" maxlength="1"></div><div class="c"><input data-r="12" data-c="3" data-a="I" maxlength="1"></div><div class="c e"></div><div class="c e"></div><div class="c e"></div><div class="c e"></div><div class="c e"></div><div class="c e"></div><div class="c e"></div><div class="c e"></div><div class="c e"></div><div class="c e"></div><div class="c e"></div><div class="c e"></div>
+            </div>
         </div>
 
-        <div class="definitions-container">
-            <div class="def-list">
+        <div class="definitions-column">
+            <div class="definitions-container">
                 <h3>Orizzontali</h3>
-                <div class="def-item" onclick="focusDef('2. ORIZZONTALE', 'Il gigante verde fortissimo in cui si trasforma lo scienziato Bruce Banner quando si arrabbia.')"><span class="def-num">2.</span> Il gigante verde Bruce Banner quando si arrabbia...</div>
-                <div class="def-item" onclick="focusDef('3. ORIZZONTALE', 'Il cognome dello scienziato Hank che rimpicciolisce le cose e ricopre il ruolo di preside della scuola.')"><span class="def-num">3.</span> Il cognome di Hank, preside della scuola...</div>
-                <div class="def-item" onclick="focusDef('5. ORIZZONTALE', 'Il gruppo di eroi soprannominati i più potenti della Terra che si è unito per la prima volta per fermare Loki.')"><span class="def-num">5.</span> Il gruppo di eroi soprannominati i più potenti della Terra...</div>
-                <div class="def-item" onclick="focusDef('6. ORIZZONTALE', 'L\'organizzazione segreta di Nick Fury che ha ideato il piano per riunire gli eroi.')"><span class="def-num">6.</span> L\'organizzazione segreta guidata da Nick Fury...</div>
-                <div class="def-item" onclick="focusDef('7. ORIZZONTALE', 'La supereroina capace di volare e rimpicciolirsi che ha scelto il nome ufficiale della squadra.')"><span class="def-num">7.</span> La supereroina capace di volare e rimpicciolirsi...</div>
-                <div class="def-item" onclick="focusDef('9. ORIZZONTALE', 'Il Dio dell\'Inganno asgardiano, primo nemico storico che spinse gli eroi a formare il team.')"><span class="def-num">9.</span> Il Dio dell\'Inganno asgardiano, primo nemico storico...</div>
-
-                <h3>Verticali</h3>
-                <div class="def-item" onclick="focusDef('1. VERTICALE', 'Il tecnologico aereo a cinque motori utilizzato dagli eroi per spostarsi rapidamente in missione.')"><span class="def-num">1.</span> Il tecnologico aereo a cinque motori degli eroi...</div>
-                <div class="def-item" onclick="focusDef('5. VERTICALE', 'La scuola speciale creata per addestrare i giovani supereroi sotto la guida dei veterani.')"><span class="def-num">5.</span> La scuola speciale creata per addestrare i giovani eroi...</div>
-                <div class="def-item" onclick="focusDef('6. VERTICALE', 'Il cognome di Tony, il genio miliardario che ospita la squadra nella sua lussuosa Mansion a New York.')"><span class="def-num">6.</span> Il cognome di Tony, il genio che ospita la squadra...</div>
-                <div class="def-item" onclick="focusDef('8. VERTICALE', 'Il soprannome amichevole del tessiragnatele di quartiere.')"><span class="def-num">8.</span> Il soprannome amichevole del tessiragnatele...</div>
+                <div class="def-list">
+                    <div class="def-item" onclick="focusDef('2. ORIZZONTALE', 'IL GIGANTE VERDE FORTISSIMO IN CUI SI TRASFORMA LO SCIENZIATO BRUCE BANNER QUANDO SI ARRABBIA.')"><span class="def-num">2.</span> IL GIGANTE VERDE BRUCE BANNER QUANDO SI ARRABBIA...</div>
+                    <div class="def-item" onclick="focusDef('3. ORIZZONTALE', 'IL COGNOME DELLO SCIENZIATO HANK CHE RIMPICCIOLISCE LE COSE E RICOPRE IL RUOLO DI PRESIDE DELLA SCUOLA.')"><span class="def-num">3.</span> IL COGNOME DI HANK, PRESIDE DELLA SCUOLA...</div>
+                    <div class="def-item" onclick="focusDef('5. ORIZZONTALE', 'IL GRUPPO DI EROI SOPRANNOMINATI I PIÙ POTENTI DELLA TERRA CHE SI È UNITO PER LA PRIMA VOLTA PER FERMARE LOKI.')"><span class="def-num">5.</span> IL GRUPPO DI EROI SOPRANNOMINATI I PIÙ POTENTI DELLA TERRA...</div>
+                    <div class="def-item" onclick="focusDef('6. ORIZZONTALE', 'L\'ORGANIZZAZIONE SEGRETA DI NICK FURY CHE HA IDEATO IL PIANO PER RIUNIRE GLI EROI.')"><span class="def-num">6.</span> L'ORGANIZZAZIONE SEGRETA GUIDATA DA NICK FURY...</div>
+                    <div class="def-item" onclick="focusDef('7. ORIZZONTALE', 'LA SUPEREROINA CAPACE DI VOLARE E RIMPICCIOLIRSI CHE HA SCELTO IL NOME UFFICIALE DELLA SQUADRA.')"><span class="def-num">7.</span> LA SUPEREROINA CAPACE DI VOLARE E RIMPICCIOLIRSI...</div>
+                    <div class="def-item" onclick="focusDef('9. ORIZZONTALE', 'IL DIO DELL\'INGANNO ASGARDIANO, PRIMO NEMICO STORICO CHE SPINSE GLI EROI A FORMARE IL TEAM.')"><span class="def-num">9.</span> IL DIO DELL'INGANNO ASGARDIANO, PRIMO NEMICO STORICO...</div>
+                    <h3>Verticali</h3>
+                    <div class="def-item" onclick="focusDef('1. VERTICALE', 'IL TECNOLOGICO AEREO A CINQUE MOTORI UTILIZZATO DAGLI EROI PER SPOSTARSI RAPIDAMENTE IN MISSIONE.')"><span class="def-num">1.</span> IL TECNOLOGICO AEREO A CINQUE MOTORI DEGLI EROI...</div>
+                    <div class="def-item" onclick="focusDef('5. VERTICALE', 'LA SCUOLA SPECIALE CREATA PER ADDESTRARE I GIOVANI SUPEREROI SOTTO LA GUIDA DEI VETERANI.')"><span class="def-num">5.</span> LA SCUOLA SPECIALE CREATA PER ADDESTRARE I GIOVANI EROI...</div>
+                    <div class="def-item" onclick="focusDef('6. VERTICALE', 'IL COGNOME DI TONY, IL GENIO MILIARDARIO CHE OSPITA LA SQUADRA NELLA SUA LUSSUOSA MANSION A NEW YORK.')"><span class="def-num">6.</span> IL COGNOME DI TONY, IL GENIO CHE OSPITA LA SQUADRA...</div>
+                    <div class="def-item" onclick="focusDef('8. VERTICALE', 'IL SOPRANNOME AMICHEVOLE DEL TESSIRAGNATELE DI QUARTIERE.')"><span class="def-num">8.</span> IL SOPRANNOME AMICHEVOLE DEL TESSIRAGNATELE...</div>
+                </div>
             </div>
+            <button class="btn-control" onclick="checkAll()">CONTROLLA</button>
         </div>
     </div>
 
-    <div id="focus-overlay" onclick="closeFocus()">
-        <div class="focus-card">
-            <h2 id="focus-num" style="color:var(--marvel-red); font-family: 'Bangers', cursive; text-transform: uppercase; font-size: 1.8rem; margin:0 0 10px 0;"></h2>
-            <p id="focus-text" style="font-size:1.4rem; font-weight: bold; font-family: 'Segoe UI'; margin:0;"></p>
+    <div id="focus-overlay" onclick="closeFocus()"><div class="focus-card"><h2 id="focus-num"></h2><p id="focus-text"></p></div></div>
+    
+    <div id="win-overlay">
+        <div class="win-card" onclick="event.stopPropagation()">
+            <h2>MISSIONE COMPIUTA!</h2>
+            <p>"NESSUN EROE È UN'ISOLA. LA VERA FORZA RISIEDE NELLA CAPACITÀ DI UNIRE LE DIVERSITÀ PER UN OBIETTIVO COMUNE. L'ALLEANZA È LO SCUDO CHE PROTEGGE IL DOMANI."</p>
+            <button class="btn-control" onclick="document.getElementById('final-code').style.display='block';">RIVELA CODICE</button>
+            <div id="final-code">8</div>
         </div>
     </div>
 
     <script>
-        let dir = 'h'; 
-        const grid = document.getElementById('cw-grid');
+        let currentDir = 'h';
+        let winState = 0; 
+        const inputs = document.querySelectorAll('input');
 
-        function focusDef(n, t) { 
+        function focusDef(n, t) {
             document.getElementById('focus-num').innerText = n;
             document.getElementById('focus-text').innerText = t;
             document.getElementById('focus-overlay').style.display = 'flex';
         }
+        function closeFocus() { document.getElementById('focus-overlay').style.display = 'none'; }
 
-        function closeFocus() { 
-            document.getElementById('focus-overlay').style.display = 'none'; 
+        function startConfetti() {
+            const end = Date.now() + 5000;
+            const colors = ['#e23636', '#ffd700', '#0047ab', '#ffffff'];
+            (function frame() {
+                confetti({
+                    particleCount: 4,
+                    angle: 60,
+                    spread: 55,
+                    origin: { x: 0 },
+                    colors: colors,
+                    zIndex: 9999
+                });
+                confetti({
+                    particleCount: 4,
+                    angle: 120,
+                    spread: 55,
+                    origin: { x: 1 },
+                    colors: colors,
+                    zIndex: 9999
+                });
+                if (Date.now() < end) requestAnimationFrame(frame);
+            }());
         }
-        
-        // Logica migliorata per il cambio direzione al click
-        grid.addEventListener('click', (e) => {
-            if (e.target.tagName === 'INPUT') {
-                const r = parseInt(e.target.dataset.r), c = parseInt(e.target.dataset.c);
-                const nSpan = e.target.parentElement.querySelector('.n');
+
+        function resetGame() {
+            inputs.forEach(i => {
+                i.value = "";
+                i.parentElement.classList.remove('cell-correct', 'cell-wrong');
+            });
+            document.getElementById('final-code').style.display = 'none';
+            winState = 0;
+            currentDir = 'h';
+        }
+
+        function checkAll() {
+            let correct = 0;
+            inputs.forEach(i => {
+                const u = i.value.toUpperCase();
+                const ans = i.dataset.a;
+                if(u === ans) { 
+                    i.parentElement.classList.add('cell-correct'); 
+                    i.parentElement.classList.remove('cell-wrong'); 
+                    correct++; 
+                } else if(u !== "") { 
+                    i.parentElement.classList.add('cell-wrong'); 
+                    i.parentElement.classList.remove('cell-correct'); 
+                }
+            });
+            
+            if (correct === inputs.length) {
+                document.getElementById('win-overlay').style.display = 'flex';
+                winState = 1;
+                startConfetti();
+            }
+        }
+
+        window.addEventListener('click', () => {
+            if (winState === 1) {
+                document.getElementById('win-overlay').style.display = 'none';
+                winState = 2;
+            } else if (winState === 2) {
+                resetGame();
+            }
+        });
+
+        inputs.forEach(input => {
+            input.addEventListener('mousedown', (e) => {
+                e.stopPropagation();
+                const r = parseInt(input.dataset.r), c = parseInt(input.dataset.c);
+                const nSpan = input.parentElement.querySelector('.n');
                 
-                // Se clicco su un numero specifico
-                if (nSpan) {
-                    const n = nSpan.innerText;
-                    if (['1', '8'].includes(n)) dir = 'v';
-                    else if (['2', '3', '7', '9'].includes(n)) dir = 'h';
-                    else if (['5', '6'].includes(n)) {
-                        // Per le caselle ad incrocio, alterna la direzione
-                        dir = (dir === 'h') ? 'v' : 'h';
-                    }
+                // SCRITTURA INTELLIGENTE: Gestione incroci 5, 6, 8
+                if(nSpan && ['5','6','8'].includes(nSpan.innerText)) {
+                    currentDir = (currentDir === 'h' ? 'v' : 'h');
                 } else {
-                    // Se clicco su una cella senza numero, capisco la direzione dalle celle adiacenti
-                    const hasRight = document.querySelector(`input[data-r="${r}"][data-c="${c+1}"]`);
-                    const hasLeft = document.querySelector(`input[data-r="${r}"][data-c="${c-1}"]`);
-                    const hasDown = document.querySelector(`input[data-r="${r+1}"][data-c="${c}"]`);
-                    const hasUp = document.querySelector(`input[data-r="${r-1}"][data-c="${c}"]`);
-
-                    if ((hasRight || hasLeft) && !(hasDown || hasUp)) dir = 'h';
-                    else if (!(hasRight || hasLeft) && (hasDown || hasUp)) dir = 'v';
+                    const hasH = document.querySelector(`input[data-r="${r}"][data-c="${c+1}"]`) || document.querySelector(`input[data-r="${r}"][data-c="${c-1}"]`);
+                    const hasV = document.querySelector(`input[data-r="${r+1}"][data-c="${c}"]`) || document.querySelector(`input[data-r="${r-1}"][data-c="${c}"]`);
+                    if (hasH && !hasV) currentDir = 'h';
+                    else if (hasV && !hasH) currentDir = 'v';
                 }
-            }
-        });
+            });
 
-        grid.addEventListener('input', (e) => {
-            if (e.target.value.length === 1) {
-                const r = parseInt(e.target.dataset.r), c = parseInt(e.target.dataset.c);
-                
-                // Forza la direzione orizzontale per la riga 5 (AVENGERS) se non diversamente specificato
-                if (r === 5 && c === 7 && dir === 'v') {
-                    // Se l'utente clicca sulla 5 e inizia a scrivere, noi vogliamo AVENGERS (h)
-                    // A meno che non abbia cliccato due volte per andare in verticale (ACADEMY)
+            input.addEventListener('input', (e) => {
+                input.parentElement.classList.remove('cell-correct', 'cell-wrong');
+                if(e.target.value.length === 1) {
+                    const r = parseInt(input.dataset.r), c = parseInt(input.dataset.c);
+                    let next;
+                    if(currentDir === 'h') next = document.querySelector(`input[data-r="${r}"][data-c="${c+1}"]`);
+                    else next = document.querySelector(`input[data-r="${r+1}"][data-c="${c}"]`);
+                    if(next) next.focus();
                 }
-
-                let next = (dir === 'h') ? 
-                    document.querySelector(`input[data-r="${r}"][data-c="${c+1}"]`) : 
-                    document.querySelector(`input[data-r="${r+1}"][data-c="${c}"]`);
                 
-                if (next) next.focus();
-            }
-        });
+                // Controllo automatico vittoria
+                let correctCount = 0;
+                inputs.forEach(i => { if(i.value.toUpperCase() === i.dataset.a) correctCount++; });
+                if(correctCount === inputs.length) checkAll();
+            });
 
-        grid.addEventListener('keydown', (e) => {
-            const r = parseInt(e.target.dataset.r), c = parseInt(e.target.dataset.c);
-            
-            if (e.key === 'Backspace' && e.target.value === '') {
-                let prev = (dir === 'h') ? 
-                    document.querySelector(`input[data-r="${r}"][data-c="${c-1}"]`) : 
-                    document.querySelector(`input[data-r="${r-1}"][data-c="${c}"]`);
-                if (prev) prev.focus();
-            }
-            
-            // Permette di cambiare direzione con le frecce tastiera
-            if (e.key === 'ArrowRight' || e.key === 'ArrowLeft') dir = 'h';
-            if (e.key === 'ArrowDown' || e.key === 'ArrowUp') dir = 'v';
+            input.addEventListener('keydown', (e) => {
+                if(e.key === 'Backspace' && input.value === '') {
+                    const r = parseInt(input.dataset.r), c = parseInt(input.dataset.c);
+                    let prev = currentDir === 'h' ? document.querySelector(`input[data-r="${r}"][data-c="${c-1}"]`) : document.querySelector(`input[data-r="${r-1}"][data-c="${c}"]`);
+                    if(prev) prev.focus();
+                }
+                if(e.key.includes('Arrow')) {
+                    if(e.key === 'ArrowRight' || e.key === 'ArrowLeft') currentDir = 'h';
+                    else currentDir = 'v';
+                }
+            });
         });
     </script>
 </body>
